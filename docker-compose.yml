@@ -1,0 +1,165 @@
+version: "3.2"
+
+services:
+
+  u16-dg18:
+    image: u18-base
+    container_name: u16-dg18
+    hostname: u16-dg18
+    ports:
+      - "2202:22"
+    tty: true
+    dns:
+      - 8.8.8.8
+      - 172.25.0.1
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.2
+
+  u18-kite:
+    image: u18-kite
+    container_name: u18-kite
+    hostname: u18-kite
+    ports:
+      - "2203:22"
+    tty: true
+    dns:
+      - 8.8.8.8
+      - 172.25.0.1
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.3
+    
+  mdw:
+    image: u16-base
+    container_name: mdw
+    hostname: mdw
+    ports:
+      - "2210:22"
+    tty: true
+    dns:
+      - 8.8.8.8
+      - 172.25.0.1
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.10
+  sdw1:
+    image: u16-base
+    container_name: sdw1 
+    hostname: sdw1 
+    ports:
+      - "2211:22"
+    tty: true
+    dns:
+      - 8.8.8.8
+      - 172.25.0.1
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.11
+
+  sdw2:
+    image: u16-base
+    container_name: sdw2 
+    hostname: sdw2 
+    ports:
+      - "2212:22"
+    tty: true
+    dns:
+      - 8.8.8.8
+      - 172.25.0.1
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.12
+
+  mysql:
+    image: mysql/mysql-server:5.7
+    container_name: mysql1
+    hostname: mysql1
+    volumes:
+      - ./scripts:/tmp/scripts
+    environment:
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: test_user 
+      MYSQL_PASSWORD: test_passwd
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.30
+
+  oracle:
+    image: store/oracle/database-enterprise:12.2.0.1-slim 
+    container_name: oracle1
+    hostname: oracle1
+    volumes:
+      - ./scripts:/tmp/scripts
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.32
+
+  db2:
+    image: ibmcom/db2    
+    container_name: my_db2
+    hostname: my_db2
+    volumes:
+      - ./scripts:/tmp/scripts
+    environment:
+      LICENSE: accept
+      DB2INST1_PASSWORD: test_passwd
+      DBNAME: test_db
+      DB2INSTANCE: db2inst1
+    privileged: true
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.34
+
+  postgres:
+    image: postgres:9.6 
+    container_name: my_pg9 
+    hostname: my_pg9 
+    volumes:
+      - ./scripts:/tmp/scripts
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_passwd
+      POSTGRES_HOST_AUTH_METHOD: password
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.36
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: my_zookeeper 
+    hostname: my_zookeeper 
+    volumes:
+      - ./scripts:/tmp/scripts
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.38
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: my_kafka
+    hostname: my_kafka 
+    volumes:
+      - ./scripts:/tmp/scripts
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    networks:
+      my_net:
+        ipv4_address: 172.25.0.40
+
+networks:
+  my_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+

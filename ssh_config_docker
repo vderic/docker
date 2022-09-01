@@ -1,0 +1,18 @@
+Host *
+	UserKnownHostsFile=/dev/null
+	StrictHostKeyChecking=no
+	user ubuntu
+	IdentityFile ~/docker/id_rsa_docker
+	hostname localhost
+
+Host u16-dg18
+	port 2202
+Host u18-kite
+	port 2203
+
+Host mdw
+	port 2210
+Host sdw1
+	port 2211
+Host sdw2
+	port 2212
